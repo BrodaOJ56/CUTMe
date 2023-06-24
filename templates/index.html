@@ -1,0 +1,12 @@
+<form method="POST" action="/shorten">
+    <input type="url" name="url" placeholder="Enter URL" required>
+    <input type="text" name="custom_short_url" placeholder="Customize Short URL">
+    <button type="submit">Shorten URL</button>
+  </form>
+  
+  <!-- Add a QR code generation link for each shortened URL -->
+  {% for url in urls %}
+    <p>{{ url.short_url }}</p>
+    <a href="/qr/{{ url.short_code }}">Download QR Code</a>
+  {% endfor %}
+  

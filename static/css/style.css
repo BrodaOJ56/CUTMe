@@ -1,0 +1,80 @@
+/* style.css */
+
+/* Body */
+body {
+    font-size:20px;
+    color:#fff;
+    text-align: center;
+    background-color: #0085a1;
+    font-family:Lora,'Times New Roman',serif,
+    
+}
+
+/* Container */
+.container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Heading */
+h1 {
+    text-align: center;
+    margin-top: 0;
+    color: #fff;
+}
+
+/* Form */
+form {
+    margin-bottom: 20px;
+}
+
+input[type="text"] {
+    width: 100%;
+    padding: 12px 20px;
+    margin: 8px 0;
+    display: inline-block;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+}
+
+button[type="submit"] {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    background-color: #333;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+/* Shortened URL */
+.short-url {
+    margin-top: 20px;
+}
+
+.short-url a {
+    color: #333;
+    text-decoration: none;
+}
+
+/* QR Code */
+.qr-code {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.qr-code img {
+    max-width: 200px;
+}
+
+/* Visit Count */
+.visit-count {
+    text-align: center;
+    margin-top: 10px;
+    color: #666;
+    font-size: 14px;
+}
