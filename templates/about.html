@@ -1,0 +1,20 @@
+{% extends 'layout.html' %} {% block content %}
+
+<h1>About CUTMe</h1>
+
+<p>
+  Brief is the new black, this is what inspires the team at CUTMe.
+   In today’s world, it’s important to keep things as short as possible, 
+   and this applies to more concepts than you may realize. 
+   From music, speeches, to wedding receptions, brief is the new black. 
+   CUTMe is a simple tool which makes URLs as short as possible. 
+   CUTMe thinks it can disrupt the URL shortening industry and give 
+   the likes of bit.ly and ow.ly a run for their money within 2 years
+</p>
+
+<p>
+  Authentication is required to use CUTMe <a href="{{url_for('login')}}">Log in Here</a> to shorten, and get QR Code for your LONG URLs.
+
+  
+</p>
+{% endblock content %}

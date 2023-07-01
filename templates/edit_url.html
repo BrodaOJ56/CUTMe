@@ -1,0 +1,11 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+    <h1>Edit URL</h1>
+    <form action="{{ url_for('edit_url', url_id=url.id) }}" method="post">
+        <label for="long_url">Long URL:</label>
+        <input type="text" id="long_url" name="long_url" value="{{ url.long_url }}" required>
+        <button type="submit">Save</button>
+    </form>
+    <a href="{{ url_for('dashboard_all') }}">Cancel</a>
+{% endblock %}

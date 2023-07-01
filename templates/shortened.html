@@ -1,34 +1,8 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Shortened URL</title>
-</head>
-<body>
+{% extends 'layout.html' %}
+
+{% block content %}
     <h1>Shortened URL</h1>
     <p>Short URL: <a href="{{ url.short_url }}">{{ url.short_url }}</a></p>
-    <p>Short URL: <a href="{{ url.long_url }}">{{ url.long_url }}</a></p>
+    <p>Long URL: <a href="{{ url.long_url }}">{{ url.long_url }}</a></p>
     <img src="data:image/png;base64,{{ qr_img_base64 }}" alt="QR Code">
-    
-    {% if url.clicks %}
-        <h2>Statistics</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>Time</th>
-                    <th>User Agent</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for click in url.clicks %}
-                    <tr>
-                        <td>{{ click.timestamp }}</td>
-                        <td>{{ click.user_agent }}</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    {% else %}
-        <p>No statistics available for this URL.</p>
-    {% endif %}
-</body>
-</html>
+{% endblock %}

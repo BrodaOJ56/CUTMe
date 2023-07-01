@@ -1,3 +1,9 @@
+{% extends 'layout.html' %}
+{% block title %}Link Shortener{% endblock title %}
+{% block content %}
+{% if current_user.is_authenticated %}
+<h2>Welcome, {{ current_user.username }}! <span class="wave">👋🏾</span></h2>
+<br>
 <form method="POST" action="/shorten">
     <input type="url" name="url" placeholder="Enter URL" required>
     <input type="text" name="custom_short_url" placeholder="Customize Short URL">
@@ -9,4 +15,7 @@
     <p>{{ url.short_url }}</p>
     <a href="/qr/{{ url.short_code }}">Download QR Code</a>
   {% endfor %}
+
+  {% endif %}
+  {% endblock content %}
   

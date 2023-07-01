@@ -13,6 +13,8 @@ from sqlalchemy.orm import relationship
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from werkzeug.security import generate_password_hash, check_password_hash
+from flask_login import LoginManager, UserMixin, login_user, logout_user, current_user, login_required
+
 
 base_dir = os.path.dirname(os.path.realpath(__file__))
 
@@ -23,9 +25,11 @@ app.config['SECRET_KEY'] = 'dcabc46275bceb98bf55e21c'
 
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
+login_manager = LoginManager(app)
+login_manager.login_view = 'login'
 
 
-class User(db.Model):
+class User(db.Model, UserMixin):
     __tablename__ = 'users'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -38,6 +42,7 @@ class User(db.Model):
         self.password = password
 
 
+
 class URL(db.Model):
     __tablename__ = 'urls'
 
@@ -46,9 +51,8 @@ class URL(db.Model):
     long_url = db.Column(db.String)
     short_url = db.Column(db.String)
     custom_short_url = db.Column(db.String)  # Add custom_short_url attribute
-
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
     clicks = db.relationship('Analytics', backref='url', lazy='dynamic')
 
     def get_clicks(self):
@@ -70,9 +74,18 @@ class Analytics(db.Model):
     user_agent = Column(String)
 
 
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
+
+
 @app.route('/')
+@login_required
 def index():
-    return render_template('index.html')
+    user = current_user
+    urls = user.created_urls
+    return render_template('index.html', user=user, urls=urls)
+
 
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -102,6 +115,9 @@ def register():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    if current_user.is_authenticated:
+        return redirect(url_for('index'))
+
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
@@ -111,7 +127,7 @@ def login():
             flash('Invalid username or password.', 'error')
             return redirect(url_for('login'))
 
-        session['user_id'] = user.id
+        login_user(user)
         flash('Logged in successfully.', 'success')
         return redirect(url_for('index'))
 
@@ -119,13 +135,16 @@ def login():
 
 
 @app.route('/logout')
+@login_required
 def logout():
-    session.pop('user_id', None)
+    logout_user()
     flash('Logged out successfully.', 'success')
     return redirect(url_for('index'))
 
 
+
 @app.route('/shorten', methods=['POST'])
+@login_required
 def shorten():
     long_url = request.form['url']
     short_code = request.form.get('custom_short_url')
@@ -184,12 +203,102 @@ def redirect_to_long_url(short_code):
         db.session.add(analytics)
         db.session.commit()
 
-        clicks = url.get_clicks()  # Retrieve the clicks associated with the URL
-        return render_template('shortened.html', url=url, clicks=clicks)
+        return redirect(url.long_url)
     else:
         return render_template('404.html'), 404
 
+@app.route('/about')
+def about():
+    return render_template('about.html')
 
+@app.route('/dashboard')
+@login_required
+def dashboard():
+    user = current_user
+    urls = URL.query.filter_by(user_id=user.id).order_by(URL.created_at.desc()).all()
+
+    link_data = []
+    qr_img_base64 = None
+
+    for url in urls:
+        clicks = url.get_clicks()
+        click_count = len(clicks)
+
+        qr = qrcode.QRCode(version=1, box_size=10, border=5)
+        qr.add_data(url.long_url)
+        qr.make(fit=True)
+        qr_img = qr.make_image(fill_color="black", back_color="white")
+        qr_img_base64 = generate_qr_code_data_url(qr_img)
+
+        link_data.append({
+            'url': url,
+            'click_count': click_count
+        })
+
+    return render_template('dashboard.html', user=user, link_data=link_data, qr_img_base64=qr_img_base64)
+
+
+@app.route('/dashboard/all')
+@login_required
+def dashboard_all():
+    user = current_user
+    urls = URL.query.filter_by(user_id=user.id).order_by(URL.created_at.desc()).all()
+
+    link_data = []
+    qr_img_base64 = None
+
+    for url in urls:
+        clicks = url.get_clicks()
+        click_count = len(clicks)
+
+        qr = qrcode.QRCode(version=1, box_size=10, border=5)
+        qr.add_data(url.long_url)
+        qr.make(fit=True)
+        qr_img = qr.make_image(fill_color="black", back_color="white")
+        qr_img_base64 = generate_qr_code_data_url(qr_img)
+
+        link_data.append({
+            'url': url,
+            'click_count': click_count
+        })
+
+    return render_template('dashboard_all.html', user=user, link_data=link_data, qr_img_base64=qr_img_base64)
+
+@app.route('/dashboard/delete/<int:url_id>', methods=['POST'])
+@login_required
+def delete_url(url_id):
+    url = URL.query.get_or_404(url_id)
+
+    if url.user_id != current_user.id:
+        flash('You are not authorized to delete this URL.', 'error')
+        return redirect(url_for('dashboard_all'))
+
+    db.session.delete(url)
+    db.session.commit()
+
+    flash('URL deleted successfully.', 'success')
+    return redirect(url_for('dashboard_all'))
+
+
+@app.route('/dashboard/edit/<int:url_id>', methods=['GET', 'POST'])
+@login_required
+def edit_url(url_id):
+    url = URL.query.get_or_404(url_id)
+
+    if url.user_id != current_user.id:
+        flash('You are not authorized to edit this URL.', 'error')
+        return redirect(url_for('dashboard_all'))
+
+    if request.method == 'POST':
+        long_url = request.form['long_url']
+        url.long_url = long_url
+        db.session.commit()
+        flash('URL updated successfully.', 'success')
+        return redirect(url_for('dashboard_all'))
+
+    return render_template('edit_url.html', url=url)
+
+  
 
 if __name__ == '__main__':
     app.run()
