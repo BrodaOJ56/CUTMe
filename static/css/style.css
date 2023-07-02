@@ -82,7 +82,7 @@
     width: 50%;
   }
   
-  .Updatebutton {
+  .Editbutton {
     border: none;
     outline: 0;
     display: inline-block;
@@ -94,7 +94,7 @@
     width: 50%;
   }
   
-  .Updatebutton:hover {
+  .Editbutton:hover {
     background-color: rgb(44, 194, 144);
     transition: 0.3s;
   }

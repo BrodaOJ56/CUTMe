@@ -1,8 +1,11 @@
 {% extends 'layout.html' %}
 
 {% block content %}
+
+  <div class="link-card">
     <h1>Shortened URL</h1>
     <p>Short URL: <a href="{{ url.short_url }}">{{ url.short_url }}</a></p>
     <p>Long URL: <a href="{{ url.long_url }}">{{ url.long_url }}</a></p>
     <img src="data:image/png;base64,{{ qr_img_base64 }}" alt="QR Code">
+ </div>
 {% endblock %}

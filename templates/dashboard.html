@@ -5,14 +5,15 @@
     
     <h2>Your Links</h2>
 
-    {% for link in link_data[:3] %}
+{% for link in link_data %}
         <div class="link-card">
             <h3><a href="{{ link.url.short_url }}">{{ link.url.short_url }}</a></h3>
-            <img src="data:image/png;base64,{{ qr_img_base64 }}" alt="QR Code">
+            <img src="data:image/png;base64,{{ link.qr_img_base64 }}" alt="QR Code">
             <p>Created at: {{ link.url.created_at }}</p>
             <p>Clicks: {{ link.click_count }}</p>
         </div>
-    {% endfor %}
+{% endfor %}
 
     <a href="{{ url_for('dashboard_all') }}" class="link-button">View All Links</a>
 {% endblock %}
+
