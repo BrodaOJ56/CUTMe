@@ -1,23 +1,26 @@
 {% extends 'layout.html' %}
 
 {% block content %}
-<h1>Welcome, {{ user.username }}!</h1>
+    <h1>Welcome, {{ user.username }}!</h1>
     
-<h2>Your Links</h2>
-{% for link in link_data %}
-<div class="link-card">
-    <h3><a href="{{ link.url.short_url }}">{{ link.url.short_url }}</a></h3>
-    <img src="data:image/png;base64,{{ qr_img_base64 }}" alt="QR Code">
-    <p>Created at: {{ link.url.created_at }}</p>
-    <p>Clicks: {{ link.click_count }}</p>
-    <form action="{{ url_for('delete_url', url_id=link.url.id) }}" method="post">
-        <button type="submit">Delete</button>
-    </form>
-    <a href="{{ url_for('edit_url', url_id=link.url.id) }}"><button type="submit">Edit</button></a>
-</div>
-{% endfor %}
+    <h2>Your Links</h2>
+    
+    <div class="link-card-container">
+        {% for link in link_data %}
+            <div class="link-card">
+                <h3><a href="{{ link.url.short_url }}">{{ link.url.short_url }}</a></h3>
+                <img src="data:image/png;base64,{{ qr_img_base64 }}" alt="QR Code">
+                <p>Created at: {{ link.url.created_at }}</p>
+                <p>Clicks: {{ link.url.click_count }}</p>
+                <div class="link-card-buttons">
+                    <form action="{{ url_for('delete_url', url_id=link.url.id) }}" method="post">
+                        <button type="submit">Delete</button>
+                    </form>
+                    <a href="{{ url_for('edit_url', url_id=link.url.id) }}"><button type="submit">Edit</button></a>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
 
-
-
-<a href="{{ url_for('index') }}">Go back to homepage</a>
+    <a href="{{ url_for('index') }}">Go back to homepage</a>
 {% endblock %}
