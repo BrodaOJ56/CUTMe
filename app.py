@@ -159,12 +159,8 @@ def shorten():
 
     short_url = request.host_url + short_code
 
-    if 'user_id' in session:
-        user = User.query.get(session['user_id'])
-        url = URL(short_code=short_code, long_url=long_url, short_url=short_url, custom_short_url=short_code)
-        url.created_by = user
-    else:
-        url = URL(short_code=short_code, long_url=long_url, short_url=short_url, custom_short_url=short_code)
+    url = URL(short_code=short_code, long_url=long_url, short_url=short_url, custom_short_url=short_code)
+    url.user_id = current_user.id  # Set the user_id attribute to the current user's id
 
     db.session.add(url)
     db.session.commit()
