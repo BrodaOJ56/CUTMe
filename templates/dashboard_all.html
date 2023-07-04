@@ -8,17 +8,16 @@
     <div class="link-card-container">
         {% for link in link_data %}
             <div class="link-card">
-                <p>Short URL <a href="{{ link.url.short_url }}">{{ link.url.short_url }}</a></p>
+                <p>Short URL: <a href="{{ link.url.short_url }}">{{ link.url.short_url }}</a></p>
                 <img src="data:image/png;base64,{{ qr_img_base64 }}" alt="QR Code">
-                <a href="/qr/{{ link.url.short_code }}">Download QR Code</a>
                 <p>Created at: {{ link.url.created_at.strftime('%Y-%m-%d') }}</p>
-                <p>Clicks: {{ link.url.click_count }}</p>
-                <div class="link-card-buttons">
-                    <form action="{{ url_for('delete_url', url_id=link.url.id) }}" method="post">
-                        <button type="submit">Delete</button>
-                    </form>
-                    <a href="{{ url_for('edit_url', url_id=link.url.id) }}"><button type="submit">Edit</button></a>
-                </div>
+                <p>Clicks: {{ link.click_count }}</p>
+                <form action="{{ url_for('delete_url', url_id=link.url.id) }}" method="post">
+                    <button type="submit" class="delete-button">Delete</button>
+                </form>
+                <a href="{{ url_for('edit_url', url_id=link.url.id) }}"><button type="submit" class="edit-button">Edit</button></a>
+                <a href="{{ url_for('download_qr_code', url_id=link.url.id) }}" class="download-button">Download QR Code</a>
+
             </div>
         {% endfor %}
     </div>
