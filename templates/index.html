@@ -1,21 +1,23 @@
 {% extends 'layout.html' %}
-{% block title %}Link Shortener{% endblock title %}
-{% block content %}
-{% if current_user.is_authenticated %}
-<h2>Welcome, {{ current_user.username }}! <span class="wave">👋🏾</span></h2>
-<br>
-<form method="POST" action="/shorten">
-    <input type="url" name="url" placeholder="Enter URL" required>
-    <input type="text" name="custom_short_url" placeholder="Customize Short URL">
-    <button type="submit">Shorten URL</button>
-  </form>
-  
-  <!-- Add a QR code generation link for each shortened URL -->
-  {% for url in urls %}
-  <p>Short URL: <a href="{{ url.short_url }}">{{ url.short_url }}</a></p>
-    <a href="/qr/{{ url.short_code }}">Download QR Code</a>
-  {% endfor %}
 
-  {% endif %}
-  {% endblock content %}
-  
+{% block title %}
+    Link Shortener
+{% endblock title %}
+
+{% block content %}
+    {% if current_user.is_authenticated %}
+        <h2>Welcome, {{ current_user.username }}! <span class="wave">👋🏾</span></h2>
+        <br>
+        <form method="POST" action="/shorten">
+            <input type="url" name="url" placeholder="Enter URL" required>
+            <input type="text" name="custom_short_url" placeholder="Customize Short URL">
+            <button type="submit">Shorten URL</button>
+        </form>
+
+        <!-- Add a QR code generation link for each shortened URL -->
+        {% for url in urls %}
+            <p>Short URL: <a href="{{ url.short_url }}">{{ url.short_url }}</a></p>
+            <a href="{{ url_for('download_qr_code', url_id=url.id) }}">Download QR Code</a>
+        {% endfor %}
+    {% endif %}
+{% endblock content %}
