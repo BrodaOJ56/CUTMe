@@ -12,7 +12,7 @@
   
   <!-- Add a QR code generation link for each shortened URL -->
   {% for url in urls %}
-    <p>{{ url.short_url }}</p>
+  <p>Short URL: <a href="{{ url.short_url }}">{{ url.short_url }}</a></p>
     <a href="/qr/{{ url.short_code }}">Download QR Code</a>
   {% endfor %}
 
