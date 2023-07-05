@@ -14,6 +14,9 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import LoginManager, UserMixin, login_user, logout_user, current_user, login_required
+from flask import send_file, make_response
+from flask_limiter import Limiter
+
 
 
 base_dir = os.path.dirname(os.path.realpath(__file__))
@@ -27,7 +30,7 @@ db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
-
+limiter = Limiter(app)
 
 class User(db.Model, UserMixin):
     __tablename__ = 'users'
@@ -80,6 +83,7 @@ def load_user(user_id):
 
 
 @app.route('/')
+@limiter.limit('10/minute')
 @login_required
 def index():
     user = current_user
@@ -259,10 +263,6 @@ def dashboard_all():
         })
 
     return render_template('dashboard_all.html', user=user, link_data=link_data, qr_img_base64=qr_img_base64)
-
-from flask import send_file, make_response
-
-# ...
 
 @app.route('/dashboard/download/<int:url_id>')
 @login_required
