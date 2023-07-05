@@ -16,6 +16,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import LoginManager, UserMixin, login_user, logout_user, current_user, login_required
 from flask import send_file, make_response
 from flask_limiter import Limiter
+from flask_caching import Cache
 
 
 
@@ -31,6 +32,7 @@ migrate = Migrate(app, db)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
 limiter = Limiter(app)
+cache = Cache(app)
 
 class User(db.Model, UserMixin):
     __tablename__ = 'users'
@@ -149,6 +151,7 @@ def logout():
 
 @app.route('/shorten', methods=['POST'])
 @login_required
+@cache.cached(timeout=30)
 def shorten():
     long_url = request.form['url']
     short_code = request.form.get('custom_short_url')
