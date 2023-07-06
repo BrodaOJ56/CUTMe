@@ -167,18 +167,20 @@ def shorten():
     short_url = request.host_url + short_code
 
     url = URL(short_code=short_code, long_url=long_url, short_url=short_url, custom_short_url=short_code)
-    url.user_id = current_user.id  # Set the user_id attribute to the current user's id
+    url.user_id = current_user.id
 
     db.session.add(url)
     db.session.commit()
 
     qr = qrcode.QRCode(version=1, box_size=10, border=5)
-    qr.add_data(url.long_url)
+    qr.add_data(url.short_url)  # Use the short URL for QR code data
     qr.make(fit=True)
     qr_img = qr.make_image(fill_color="black", back_color="white")
     qr_img_base64 = generate_qr_code_data_url(qr_img)
 
     return render_template('shortened.html', short_url=url.short_url, qr_img_base64=qr_img_base64, url=url)
+
+
 
 
 def generate_qr_code_data_url(qr_img):
@@ -187,6 +189,12 @@ def generate_qr_code_data_url(qr_img):
     qr_img_byte_array.seek(0)
     qr_img_base64 = base64.b64encode(qr_img_byte_array.read()).decode('utf-8')
     return qr_img_base64
+
+    # Update the QR code data URL to redirect to the shortened URL
+    qr_img_data_url = f"data:image/png;base64,{qr_img_base64}"
+    qr_img_data_url = qr_img_data_url.replace('URL_PLACEHOLDER', short_url)
+
+    return qr_img_data_url
 
 
 def generate_short_code():
@@ -235,10 +243,12 @@ def dashboard():
 
         link_data.append({
             'url': url,
-            'click_count': click_count
+            'click_count': click_count,
+            'qr_img_base64': qr_img_base64  # Add qr_img_base64 to link_data
         })
 
-    return render_template('dashboard.html', user=user, link_data=link_data, qr_img_base64=qr_img_base64)
+    return render_template('dashboard.html', user=user, link_data=link_data)
+
 
 
 @app.route('/dashboard/all')
@@ -248,27 +258,30 @@ def dashboard_all():
     urls = URL.query.filter_by(user_id=user.id).order_by(URL.created_at.desc()).all()
 
     link_data = []
-    qr_img_base64 = None
 
     for url in urls:
         clicks = url.get_clicks()
         click_count = len(clicks)
 
         qr = qrcode.QRCode(version=1, box_size=10, border=5)
-        qr.add_data(url.long_url)
+        qr.add_data(url.short_url)  # Use the short URL for QR code data
         qr.make(fit=True)
         qr_img = qr.make_image(fill_color="black", back_color="white")
         qr_img_base64 = generate_qr_code_data_url(qr_img)
 
         link_data.append({
             'url': url,
-            'click_count': click_count
+            'click_count': click_count,
+            'qr_img_base64': qr_img_base64  # Pass the QR code base64 string to the template
         })
 
-    return render_template('dashboard_all.html', user=user, link_data=link_data, qr_img_base64=qr_img_base64)
+    return render_template('dashboard_all.html', user=user, link_data=link_data)
+
 
 @app.route('/dashboard/download/<int:url_id>')
 @login_required
+@cache.cached(timeout=30)
+@limiter.limit('10/minute')
 def download_qr_code(url_id):
     url = URL.query.get_or_404(url_id)
 
@@ -308,6 +321,7 @@ def delete_url(url_id):
 
 @app.route('/dashboard/edit/<int:url_id>', methods=['GET', 'POST'])
 @login_required
+@limiter.limit('10/minute')
 def edit_url(url_id):
     url = URL.query.get_or_404(url_id)
 
