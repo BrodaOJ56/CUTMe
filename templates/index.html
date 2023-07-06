@@ -22,8 +22,22 @@
             
                 <p>Short URL: <a href="{{ url.short_url }}">{{ url.short_url }}</a></p>
                 <a href="{{ url_for('download_qr_code', url_id=url.id) }}" class="download-button">Download QR Code</a>
+                <p> 
+                    <button type="button" id="copy-button" onclick="copyToClipboard('{{ url.short_url }}')">Copy Shortened URL</button>
+                   </p>
             </div>
         {% endfor %}
         </div>
     {% endif %}
+    <script>
+        function copyToClipboard(text) {
+          const textarea = document.createElement('textarea');
+          textarea.value = text;
+          document.body.appendChild(textarea);
+          textarea.select();
+          document.execCommand('copy');
+          document.body.removeChild(textarea);
+          alert('URL copied to clipboard!');
+        }
+      </script>
 {% endblock content %}

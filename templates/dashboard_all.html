@@ -12,19 +12,35 @@
             <a href="{{ url_for('download_qr_code', url_id=link.url.id) }}" class="download-button">Download QR Code</a>
             <p>Created at: {{ link.url.created_at.strftime('%Y-%m-%d') }}</p>
             <p>Clicks: {{ link.click_count }}</p>
-            
-                <p>Long URL: <br>
-                    <a href="{{ link.url.long_url }}">{{ link.url.long_url }}</a>
-                </p>
-            
+            <p>Long URL: <br>
+                <a href="{{ link.url.long_url }}">{{ link.url.long_url }}</a>
+            </p>
             <p>Short URL: <a href="{{ link.url.short_url }}">{{ link.url.short_url }}</a></p>
-            <form action="{{ url_for('delete_url', url_id=link.url.id) }}" method="post">
-                <button type="submit" class="delete-button">Delete</button>
-            </form>
-            <a href="{{ url_for('edit_url', url_id=link.url.id) }}"><button type="submit" class="edit-button">Edit</button></a>
+            <p>
+             <button type="button" id="copy-button" onclick="copyToClipboard('{{ link.url.short_url }}')">Copy Shortened URL</button>
+            </p>
+            <div class="button-container">
+                <a href="{{ url_for('edit_url', url_id=link.url.id) }}"><button type="submit" class="edit-button">Edit</button></a>
+                <form action="{{ url_for('delete_url', url_id=link.url.id) }}" method="post">
+                    <button type="submit" class="delete-button">Delete</button>
+                </form>
+            </div>
+            
         </div>
     {% endfor %}
 </div>
 
     <a href="{{ url_for('index') }}">Go back to homepage</a>
+
+    <script>
+    function copyToClipboard(text) {
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textarea);
+      alert('URL copied to clipboard!');
+    }
+  </script>
 {% endblock %}
