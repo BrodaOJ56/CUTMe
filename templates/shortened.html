@@ -1,10 +1,24 @@
 {% extends 'layout.html' %}
 
 {% block content %}
-<div class="link-card">
-  <h2>Shortened URL</h2>
-  <p>Long URL: <a href="{{ url.long_url }}">{{ url.long_url }}</a></p>
-  <p>Short URL: <a href="{{ url.short_url }}">{{ url.short_url }}</a></p>
-  <img src="data:image/png;base64,{{ qr_img_base64 }}" alt="QR Code">
+<div class="link-card-container">
+    <div class="link-card">
+        <h2>Shortened URL</h2>
+        <img src="data:image/png;base64,{{ qr_img_base64 }}" alt="QR Code">
+        <br>
+        <a href="{{ url_for('download_qr_code', url_id=url.id) }}" class="download-button">Download QR Code</a>
+        <form action="{{ url_for('delete_url', url_id=url.id) }}" method="post">
+          <p>Long URL: 
+            <a href="{{ url.long_url }}">{{ url.long_url }}</a>
+        </p>
+        <p>Short URL: 
+            <a href="{{ url.short_url }}">{{ url.short_url }}</a>
+        </p>
+          </form>
+          <a href="{{ url_for('edit_url', url_id=url.id) }}"><button type="submit" class="edit-button">Edit</button></a>
+            <button type="submit" class="delete-button">Delete</button>
+    </div>
 </div>
+
+<a href="{{ url_for('dashboard_all') }}" class="view-all-button">View All Links</a>
 {% endblock %}
