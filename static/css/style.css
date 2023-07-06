@@ -34,6 +34,7 @@
   a {
     text-decoration: none;
     color: #17a2b8;
+    overflow-wrap: break-word;
   }
   a:hover {
     color:
@@ -87,6 +88,16 @@
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
+.link-card .long-url {
+  width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.link-card .long-url p {
+  margin: 0;
+}
 .link-card p {
     margin-bottom: 10px;
 }
