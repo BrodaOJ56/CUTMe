@@ -16,23 +16,51 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import LoginManager, UserMixin, login_user, logout_user, current_user, login_required
 from flask import send_file, make_response
 from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 from flask_caching import Cache
+from dotenv import load_dotenv
 
+
+
+app = Flask(__name__)
 
 
 base_dir = os.path.dirname(os.path.realpath(__file__))
 
-app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(base_dir, 'cut_db.db')
-app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-app.config['SECRET_KEY'] = 'dcabc46275bceb98bf55e21c'
+load_dotenv()
+
+uri = os.environ.get('DATABASE_URL')
+if uri.startswith('postgres://'):
+    uri = uri.replace('postgres://', 'postgresql://', 1)
+
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(base_dir, 'cut_db.db')
+# app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+# app.config['SECRET_KEY'] = 'dcabc46275bceb98bf55e21c'
+
+app.config['SQLALCHEMY_DATABASE_URI'] = uri
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
+app.config['CACHE_TYPE'] = 'SimpleCache'
+app.config['CACHE_DEFAULT_TIMEOUT'] = 300
+
 
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
-limiter = Limiter(app)
+# limiter = Limiter(app)
+limiter = Limiter(get_remote_address)
 cache = Cache(app)
+
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
+
+with app.app_context():
+    db.create_all()
+
+
 
 class User(db.Model, UserMixin):
     __tablename__ = 'users'
