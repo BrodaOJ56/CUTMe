@@ -39,7 +39,7 @@ if uri.startswith('postgres://'):
 
 app.config['SQLALCHEMY_DATABASE_URI'] = uri
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
+app.config['SECRET_KEY'] = 'dcabc46275bceb98bf55e21c' #os.environ.get('SECRET_KEY')
 app.config['CACHE_TYPE'] = 'SimpleCache'
 app.config['CACHE_DEFAULT_TIMEOUT'] = 300
 
@@ -66,13 +66,14 @@ class User(db.Model, UserMixin):
     __tablename__ = 'users'
 
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(50), unique=True, nullable=False)
-    password = db.Column(db.String(100), nullable=False)
+    username = db.Column(db.String(150), unique=True, nullable=False)  
+    password = db.Column(db.Text, nullable=False)
     created_urls = db.relationship('URL', backref='created_by', foreign_keys='URL.user_id')
 
     def __init__(self, username, password):
         self.username = username
         self.password = password
+
 
 
 
