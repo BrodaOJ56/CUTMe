@@ -1,20 +1,17 @@
-{% extends 'layout.html' %} {% block content %}
+{% extends 'layout.html' %}
 
-<h1>About CUTMe</h1>
+{% block content %}
+    <h1>About CUTMe</h1>
 
-<p>
-  Brief is the new black, this is what inspires the team at CUTMe.
-   In today’s world, it’s important to keep things as short as possible, 
-   and this applies to more concepts than you may realize. 
-   From music, speeches, to wedding receptions, brief is the new black. 
-   CUTMe is a simple tool which makes URLs as short as possible. 
-   CUTMe thinks it can disrupt the URL shortening industry and give 
-   the likes of bit.ly and ow.ly a run for their money within 2 years
-</p>
+    <p>
+        CUTMe is a simple and efficient URL shortening tool designed to make your URLs as short as possible. In today's fast-paced world, it's important to keep things concise, and that's where CUTMe comes in. Whether you're sharing links on social media, sending URLs via text message, or simply want to tidy up long web addresses, CUTMe has got you covered.
+    </p>
 
-<p>
-  Authentication is required to use CUTMe <a href="{{url_for('login')}}">Log in Here</a> to shorten, and get QR Code for your LONG URLs.
+    <p>
+        With CUTMe, you can quickly shorten your URLs and obtain a compact, easy-to-share link. Additionally, CUTMe provides QR codes for your shortened URLs, allowing for seamless scanning and sharing on various platforms. Say goodbye to lengthy, unwieldy URLs and hello to streamlined, user-friendly links with CUTMe.
+    </p>
 
-  
-</p>
+    <p>
+        To start using CUTMe, simply log in or create an account. Authentication is required to ensure the security and privacy of your shortened URLs. If you already have an account, you can <a href="{{ url_for('login') }}">log in here</a> to access the URL shortening and QR code generation features.
+    </p>
 {% endblock content %}
