@@ -2,10 +2,12 @@
 
 {% block content %}
     <h1>Edit URL</h1>
+    <div class="button-container">
     <form action="{{ url_for('edit_url', url_id=url.id) }}" method="post">
         <label for="long_url">Long URL:</label>
         <input type="text" id="long_url" name="long_url" value="{{ url.long_url }}" required>
-        <button type="submit">Save</button>
+        <button type="submit" class="save-button">Save</button>
     </form>
-    <a href="{{ url_for('dashboard_all') }}"><button type="submit">Cancel</button></a>
+    </div>
+    <a href="{{ url_for('dashboard_all') }}"><button type="submit" class="cancel-button">Cancel</button></a>
 {% endblock %}
