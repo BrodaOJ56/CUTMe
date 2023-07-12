@@ -112,7 +112,7 @@
     max-width: 200px;
 }
 
-.link-card .delete-button {
+.link-card .delete-button, .cancel-button {
     background-color: #f44336;
     color: white;
     border: none;
@@ -121,8 +121,8 @@
     cursor: pointer;
 }
 
-.link-card .edit-button {
-    background-color: #2196F3;
+.link-card .edit-button , .save-button{
+    background-color:#4CAF50;
     color: white;
     border: none;
     padding: 5px 10px;
