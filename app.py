@@ -200,15 +200,12 @@ def shorten():
     db.session.commit()
 
     qr = qrcode.QRCode(version=1, box_size=10, border=5)
-    qr.add_data(url.short_url)  # Use the short URL for QR code data
+    qr.add_data(short_url)  # Use the shortened URL for QR code data
     qr.make(fit=True)
     qr_img = qr.make_image(fill_color="black", back_color="white")
-    qr_img_base64 = generate_qr_code_data_url(qr_img, url.short_url)
-
+    qr_img_base64 = generate_qr_code_data_url(qr_img)
 
     return render_template('shortened.html', short_url=url.short_url, qr_img_base64=qr_img_base64, url=url)
-
-
 
 
 def generate_qr_code_data_url(qr_img):
@@ -217,6 +214,7 @@ def generate_qr_code_data_url(qr_img):
     qr_img_byte_array.seek(0)
     qr_img_base64 = base64.b64encode(qr_img_byte_array.read()).decode('utf-8')
     return qr_img_base64
+
 
 
 
@@ -289,8 +287,7 @@ def dashboard_all():
         qr.add_data(url.short_url)  # Use the short URL for QR code data
         qr.make(fit=True)
         qr_img = qr.make_image(fill_color="black", back_color="white")
-        qr_img_base64 = generate_qr_code_data_url(qr_img, url.short_url)
-
+        qr_img_base64 = generate_qr_code_data_url(qr_img)
 
         link_data.append({
             'url': url,
@@ -299,7 +296,6 @@ def dashboard_all():
         })
 
     return render_template('dashboard_all.html', user=user, link_data=link_data)
-
 
 @app.route('/dashboard/download/<int:url_id>')
 @login_required
