@@ -203,7 +203,8 @@ def shorten():
     qr.add_data(url.short_url)  # Use the short URL for QR code data
     qr.make(fit=True)
     qr_img = qr.make_image(fill_color="black", back_color="white")
-    qr_img_base64 = generate_qr_code_data_url(qr_img)
+    qr_img_base64 = generate_qr_code_data_url(qr_img, url.short_url)
+
 
     return render_template('shortened.html', short_url=url.short_url, qr_img_base64=qr_img_base64, url=url)
 
@@ -217,11 +218,6 @@ def generate_qr_code_data_url(qr_img):
     qr_img_base64 = base64.b64encode(qr_img_byte_array.read()).decode('utf-8')
     return qr_img_base64
 
-    # Update the QR code data URL to redirect to the shortened URL
-    qr_img_data_url = f"data:image/png;base64,{qr_img_base64}"
-    qr_img_data_url = qr_img_data_url.replace('URL_PLACEHOLDER', short_url)
-
-    return qr_img_data_url
 
 
 def generate_short_code():
@@ -256,14 +252,13 @@ def dashboard():
     urls = URL.query.filter_by(user_id=user.id).order_by(URL.created_at.desc()).all()
 
     link_data = []
-    qr_img_base64 = None
 
     for url in urls:
         clicks = url.get_clicks()
         click_count = len(clicks)
 
         qr = qrcode.QRCode(version=1, box_size=10, border=5)
-        qr.add_data(url.long_url)
+        qr.add_data(url.short_url)  # Use the short URL for QR code data
         qr.make(fit=True)
         qr_img = qr.make_image(fill_color="black", back_color="white")
         qr_img_base64 = generate_qr_code_data_url(qr_img)
@@ -271,7 +266,7 @@ def dashboard():
         link_data.append({
             'url': url,
             'click_count': click_count,
-            'qr_img_base64': qr_img_base64  # Add qr_img_base64 to link_data
+            'qr_img_base64': qr_img_base64  # Pass the QR code base64 string to the template
         })
 
     return render_template('dashboard.html', user=user, link_data=link_data)
@@ -294,7 +289,8 @@ def dashboard_all():
         qr.add_data(url.short_url)  # Use the short URL for QR code data
         qr.make(fit=True)
         qr_img = qr.make_image(fill_color="black", back_color="white")
-        qr_img_base64 = generate_qr_code_data_url(qr_img)
+        qr_img_base64 = generate_qr_code_data_url(qr_img, url.short_url)
+
 
         link_data.append({
             'url': url,
