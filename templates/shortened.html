@@ -6,7 +6,7 @@
     <h2>Shortened URL</h2>
     <img src="data:image/png;base64,{{ qr_img_base64 }}" alt="QR Code">
     <br>
-    <a href="{{ url_for('download_qr_code', url_id=url.id) }}" class="download-button">Download QR Code</a>
+    <a href="{{ url_for('generate_qr_code_link', short_code=url.short_code) }}" class="download-button">Download QR Code</a>
         <p>
           Long URL: <br>
         <a href="{{ url.long_url }}">{{ url.long_url }}</a>
