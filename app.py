@@ -297,29 +297,52 @@ def dashboard_all():
 
     return render_template('dashboard_all.html', user=user, link_data=link_data)
 
-@app.route('/dashboard/download/<int:url_id>')
+# @app.route('/dashboard/download/<int:url_id>')
+# @login_required
+# @cache.cached(timeout=30)
+# @limiter.limit('10/minute')
+# def download_qr_code(url_id):
+#     url = URL.query.get_or_404(url_id)
+
+#     if url.user_id != current_user.id:
+#         flash('You are not authorized to download this QR code.', 'error')
+#         return redirect(url_for('dashboard'))
+
+#     qr = qrcode.QRCode(version=1, box_size=10, border=5)
+#     qr.add_data(url.long_url)
+#     qr.make(fit=True)
+#     qr_img = qr.make_image(fill_color="black", back_color="white")
+
+#     qr_img_io = BytesIO()
+#     qr_img.save(qr_img_io, format='PNG')
+#     qr_img_io.seek(0)
+
+#     response = make_response(send_file(qr_img_io, mimetype='image/png'))
+#     response.headers.set('Content-Disposition', 'attachment', filename='qr_code.png')
+#     return response
+
+@app.route('/<short_code>/qr_code')
 @login_required
 @cache.cached(timeout=30)
 @limiter.limit('10/minute')
-def download_qr_code(url_id):
-    url = URL.query.get_or_404(url_id)
+def generate_qr_code_link(short_code):
+    url = URL.query.filter_by(short_code=short_code).first()
+    if url:
+        qr = qrcode.QRCode(version=1, box_size=10, border=5)
+        qr.add_data(url.short_url)
+        qr.make(fit=True)
+        qr_img = qr.make_image(fill_color="black", back_color="white")
+        qr_img_io = BytesIO()
+        qr_img.save(qr_img_io, format='PNG')
+        qr_img_io.seek(0)
 
-    if url.user_id != current_user.id:
-        flash('You are not authorized to download this QR code.', 'error')
-        return redirect(url_for('dashboard'))
+        response = make_response(send_file(qr_img_io, mimetype='image/png'))
+        response.headers.set('Content-Disposition', 'attachment', filename='qr_code.png')
+        return response
+    else:
+        return render_template('404.html'), 404
 
-    qr = qrcode.QRCode(version=1, box_size=10, border=5)
-    qr.add_data(url.long_url)
-    qr.make(fit=True)
-    qr_img = qr.make_image(fill_color="black", back_color="white")
 
-    qr_img_io = BytesIO()
-    qr_img.save(qr_img_io, format='PNG')
-    qr_img_io.seek(0)
-
-    response = make_response(send_file(qr_img_io, mimetype='image/png'))
-    response.headers.set('Content-Disposition', 'attachment', filename='qr_code.png')
-    return response
 
 
 @app.route('/dashboard/delete/<int:url_id>', methods=['POST'])
