@@ -9,7 +9,7 @@
         {% for link in link_data[:3] %}
             <div class="link-card">
                 <img src="data:image/png;base64,{{ link.qr_img_base64 }}" alt="QR Code">
-                <a href="{{ url_for('download_qr_code', url_id=link.url.id) }}" class="download-button">Download QR Code</a>
+                <a href="{{ url_for('generate_qr_code_link', short_code=link.url.short_code) }}" class="download-button">Download QR Code</a>
                 <p>Created at: {{ link.url.created_at.strftime('%Y-%m-%d') }}</p>
                 <p>Clicks: {{ link.click_count }}</p>
                 <p>Long URL: <a href="{{ link.url.long_url }}">{{ link.url.long_url }}</a></p>
